@@ -7,9 +7,10 @@
 //
 // Instrucoes suportadas:
 //   R-type  (0110011): add, and
-//   I-type  (0000011): lw
+//   L-type  (0000011): lw
 //   S-type  (0100011): sw
 //   B-type  (1100011): beq
+//   I-typt  (0010011): addi, subi
 //
 // Tabela de sinais de controle:
 //   Sinal     | R-type | lw | sw | beq
@@ -41,6 +42,8 @@ module pl_control (
     localparam LOAD   = 7'b0000011;
     localparam STORE  = 7'b0100011;
     localparam BRANCH = 7'b1100011;
+    localparam I_TYPE = 7'b0010011;
+    localparam U_TYPE_AUIPC = 7'b
 
     always_comb begin
         ALUSrc   = 1'b0;
@@ -52,6 +55,11 @@ module pl_control (
         ALUOp    = 2'b00;
 
         case (Opcode)
+            I_TYPE: begin
+                ALUSrc   = 1'b1;
+                MemtoReg = 1'b0;
+                RegWrite = 1'b1;
+                ALUOp    = 2'b11;
             R_TYPE: begin
                 ALUSrc   = 1'b0;
                 MemtoReg = 1'b0;
