@@ -41,7 +41,16 @@ module pl_alu_ctrl (
                     default: Operation = 4'd01;
                 endcase
             end
-
+            2'b11: begin
+                case (Funct3)
+                    3'b000: Operation = Funct7[5] ? 4'd02 : 4'd01; // SUBI ou ADDI
+                    3'b100: Operation = 4'd03;  // XORI
+                    3'b110: Operation = 4'd04;  // ORI
+                    3'b111: Operation = 4'd05;  // ANDI
+                    3'b001: Operation = 4'd06;  // SLLI
+                    3'b101: Operation = Funct7[5] ? 4'd08 : 4'd07;  // SRAI ou SRLI
+                    3'b010: Operation = 4'd11;  // SLTI
+                    default: Operation = 4'd01;
             default: Operation = 4'd01;
         endcase
     end
