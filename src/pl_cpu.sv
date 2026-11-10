@@ -47,6 +47,7 @@ module pl_cpu (
 
     logic       ALUSrc, MemtoReg, RegWrite, MemRead, MemWrite, Branch;
     logic [1:0] ALUOp;
+    logic [1:0] ASrc; // Sinal do tipo U
 
     logic [2:0] funct3_ex;
     logic [6:0] funct7_ex;
@@ -59,6 +60,7 @@ module pl_cpu (
     pl_control ctrl (
         .Opcode   (opcode),
         .ALUSrc   (ALUSrc),
+        .ASrc     (ASrc),
         .MemtoReg (MemtoReg),
         .RegWrite (RegWrite),
         .MemRead  (MemRead),
@@ -90,6 +92,7 @@ module pl_cpu (
         .MemWrite     (MemWrite),
         .Branch       (Branch),
         .ALUOp        (ALUOp),
+        .ASrc         (ASrc),
         .ALU_CC       (alu_cc),
         .Opcode       (opcode),
         .Funct3_EX    (funct3_ex),
