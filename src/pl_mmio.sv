@@ -43,14 +43,17 @@ module pl_mmio (
 );
 
     // -------------------------------------------------------------------------
-    // Sequenciador de transmissao de 4 bytes (little-endian)
-    //
-    // Quando o CPU executa SW para 0x410, os 4 bytes da palavra sao enviados
-    // sequencialmente: byte[7:0] primeiro, byte[31:24] por ultimo.
-    // tx_word_busy permanece alto enquanto houver bytes pendentes.
-    // O CPU deve aguardar tx_busy == 0 (bit 9 de LW 0x410) antes de nova SW.
+    // Sinais do sequenciador de TX
+    // Declarados ANTES da instancia da UART: tx_byte e usado na conexao
+    // .tx_data(tx_byte) abaixo. Usar um nome antes de declara-lo faz o
+    // compilador criar um fio implicito de 1 bit, e a declaracao posterior
+    // vira "dupla declaracao" no ModelSim.
     // -------------------------------------------------------------------------
+    logic [31:0] tx_word;       // palavra de 32 bits em transmissao
+    logic [1:0]  tx_byte_idx;   // indice do byte atual (0=LSB, 3=MSB)
+    logic        tx_word_busy;  // alto enquanto houver bytes a enviar
     logic [7:0]  tx_byte;       // byte corrente entregue a UART
+
     // -------------------------------------------------------------------------
     // Instancia da UART
     // -------------------------------------------------------------------------
@@ -75,9 +78,6 @@ module pl_mmio (
     );
 
     // -------------------------------------------------------------------------
-    logic [31:0] tx_word;       // palavra de 32 bits em transmissao
-    logic [1:0]  tx_byte_idx;   // indice do byte atual (0=LSB, 3=MSB)
-    logic        tx_word_busy;  // alto enquanto houver bytes a enviar
     // Sequenciador de transmissao de 4 bytes (little-endian)
     //
     // Quando o CPU executa SW para 0x410, os 4 bytes da palavra sao enviados
@@ -85,47 +85,6 @@ module pl_mmio (
     // tx_word_busy permanece alto enquanto houver bytes pendentes.
     // O CPU deve aguardar tx_busy == 0 (bit 9 de LW 0x410) antes de nova SW.
     // -------------------------------------------------------------------------
-    logic [31:0] tx_word;       // palavra de 32 bits em transmissao
-    logic [1:0]  tx_byte_idx;   // indice do byte atual (0=LSB, 3=MSB)
-    logic        tx_word_busy;  // alto enquanto houver bytes a enviar
-    logic [7:0]  tx_byte;       // byte corrente entregue a UART
-    // -------------------------------------------------------------------------
-    // Sequenciador de transmissao de 4 bytes (little-endian)
-    //
-    // Quando o CPU executa SW para 0x410, os 4 bytes da palavra sao enviados
-    // sequencialmente: byte[7:0] primeiro, byte[31:24] por ultimo.
-    // tx_word_busy permanece alto enquanto houver bytes pendentes.
-    // O CPU deve aguardar tx_busy == 0 (bit 9 de LW 0x410) antes de nova SW.
-    // -------------------------------------------------------------------------
-    logic [31:0] tx_word;       // palavra de 32 bits em transmissao
-    logic [1:0]  tx_byte_idx;   // indice do byte atual (0=LSB, 3=MSB)
-    logic        tx_word_busy;  // alto enquanto houver bytes a enviar
-    logic [7:0]  tx_byte;       // byte corrente entregue a UART
-    // -------------------------------------------------------------------------
-    // Sequenciador de transmissao de 4 bytes (little-endian)
-    //
-    // Quando o CPU executa SW para 0x410, os 4 bytes da palavra sao enviados
-    // sequencialmente: byte[7:0] primeiro, byte[31:24] por ultimo.
-    // tx_word_busy permanece alto enquanto houver bytes pendentes.
-    // O CPU deve aguardar tx_busy == 0 (bit 9 de LW 0x410) antes de nova SW.
-    // -------------------------------------------------------------------------
-    logic [31:0] tx_word;       // palavra de 32 bits em transmissao
-    logic [1:0]  tx_byte_idx;   // indice do byte atual (0=LSB, 3=MSB)
-    logic        tx_word_busy;  // alto enquanto houver bytes a enviar
-    logic [7:0]  tx_byte;       // byte corrente entregue a UART
-    // -------------------------------------------------------------------------
-    // Sequenciador de transmissao de 4 bytes (little-endian)
-    //
-    // Quando o CPU executa SW para 0x410, os 4 bytes da palavra sao enviados
-    // sequencialmente: byte[7:0] primeiro, byte[31:24] por ultimo.
-    // tx_word_busy permanece alto enquanto houver bytes pendentes.
-    // O CPU deve aguardar tx_busy == 0 (bit 9 de LW 0x410) antes de nova SW.
-    // -------------------------------------------------------------------------
-    logic [31:0] tx_word;       // palavra de 32 bits em transmissao
-    logic [1:0]  tx_byte_idx;   // indice do byte atual (0=LSB, 3=MSB)
-    logic        tx_word_busy;  // alto enquanto houver bytes a enviar
-    logic [7:0]  tx_byte;       // byte corrente entregue a UART
-
     always_comb begin
         case (tx_byte_idx)
             2'd0: tx_byte = tx_word[7:0];
