@@ -35,7 +35,7 @@ module pl_control (
     output logic       MemRead,
     output logic       MemWrite,
     output logic       Branch,
-    output logic       ASrc, // Novo sinal de controle para add 0 em LUI ou add PC em AIUPC
+    output logic [1:0] ASrc, // Novo sinal de controle para add 0 em LUI ou add PC em AIUPC
     output logic [1:0] ALUOp
 );
 
