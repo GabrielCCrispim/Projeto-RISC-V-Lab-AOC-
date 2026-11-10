@@ -45,7 +45,7 @@ module pl_control (
     localparam BRANCH = 7'b1100011;
     localparam I_TYPE = 7'b0010011;
     localparam U_TYPE_AUIPC = 7'b0010111;
-    localparam U_TYPE_LUI = 7'0110111;
+    localparam U_TYPE_LUI = 7'b0110111;
 
     always_comb begin
         ALUSrc   = 1'b0;
@@ -63,6 +63,7 @@ module pl_control (
                 MemtoReg = 1'b0;
                 RegWrite = 1'b1;
                 ALUOp    = 2'b11;
+				end
             R_TYPE: begin
                 ALUSrc   = 1'b0;
                 MemtoReg = 1'b0;
