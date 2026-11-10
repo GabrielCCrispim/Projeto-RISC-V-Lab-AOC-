@@ -43,7 +43,7 @@ module pl_alu_ctrl (
             end
             2'b11: begin
                 case (Funct3)
-                    3'b000: Operation = Funct7[5] ? 4'd02 : 4'd01; // SUBI ou ADDI
+                    3'b000: Operation = 4'd01; //ADDI
                     3'b100: Operation = 4'd03;  // XORI
                     3'b110: Operation = 4'd04;  // ORI
                     3'b111: Operation = 4'd05;  // ANDI
