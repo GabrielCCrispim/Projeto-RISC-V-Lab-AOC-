@@ -21,6 +21,7 @@ package pl_pipe_pkg;
     typedef struct packed {
         // sinais de controle propagados para os estagios seguintes
         logic        alu_src;
+        logic [1:0]  a_src;
         logic        mem_to_reg;
         logic        reg_write;
         logic        mem_read;
