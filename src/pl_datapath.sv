@@ -35,6 +35,7 @@ module pl_datapath (
     input  logic        MemRead,
     input  logic        MemWrite,
     input  logic        Branch,
+	 input  logic [1:0]  ASrc,  //00 == rc1, 01 == zero(LUI), 10 = PC (AUIPC)
     input  logic [1:0]  ALUOp,
 
     // Codigo de operacao da ALU (pl_alu_ctrl, usa campos do estagio EX)
