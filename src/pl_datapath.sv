@@ -91,6 +91,7 @@ module pl_datapath (
     logic [31:0] fwd_srca, fwd_srcb, alu_srcb;
     logic [31:0] alu_result;
     logic        zero;
+    logic [31:0] alu_srca; // valor que será adicionado - 0(LUI) ou a PC(AUIPC)
 
     // WB
     logic [31:0] wb_data;
@@ -185,6 +186,7 @@ module pl_datapath (
             id_ex.mem_read   <= 1'b0;
             id_ex.mem_write  <= 1'b0;
             id_ex.alu_op     <= 2'b00;
+            id_ex.a_src      <= 2'b00;
             id_ex.branch     <= 1'b0;
             id_ex.pc         <= 32'b0;
             id_ex.rd1        <= 32'b0;
@@ -202,6 +204,7 @@ module pl_datapath (
             id_ex.mem_read   <= 1'b0;
             id_ex.mem_write  <= 1'b0;
             id_ex.alu_op     <= 2'b00;
+            id_ex.a_src      <= 2'b00;
             id_ex.branch     <= 1'b0;
             id_ex.pc         <= 32'b0;
             id_ex.rd1        <= 32'b0;
@@ -219,6 +222,7 @@ module pl_datapath (
             id_ex.mem_read   <= MemRead;
             id_ex.mem_write  <= MemWrite;
             id_ex.alu_op     <= ALUOp;
+            id_ex.a_src      <= ASrc;
             id_ex.branch     <= Branch;
             id_ex.pc         <= if_id.pc;
             id_ex.rd1        <= rd1;
@@ -272,8 +276,17 @@ module pl_datapath (
     // Mux ALUSrc: imediato ou registrador
     assign alu_srcb = id_ex.alu_src ? id_ex.imm_ext : fwd_srcb;
 
+    // Bloco que define quais dados irá pegar para adiciocar ao comandos de LUI e AUIPC
+    always_comb begin
+        case (id_ex.a_src)
+            2'b10:   alu_srca = id_ex.pc; // PC - AUIPC
+            2'b01:   alu_srca = 32'b0;    // 0 - LUI
+            default: alu_srca = fwd_srca; // Sinal que estava antes no bloco de alu para o adiantamento de A
+        endcase
+    end
+
     pl_alu alu (
-        .SrcA      (fwd_srca),
+        .SrcA      (alu_srca), // foi de fwd_srca para alu_srca, pois é um sinal para os tipos U ou o fwd_srca
         .SrcB      (alu_srcb),
         .Operation (ALU_CC),
         .ALUResult (alu_result),
