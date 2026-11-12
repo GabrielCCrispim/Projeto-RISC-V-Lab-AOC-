@@ -302,10 +302,11 @@ module pl_datapath (
             1'b0: pc_src = 0;
             1'b1: begin
                 case(id_ex.funct3)
-                    3'b001: zero = !zero;
-                    3'b101: zero = !zero;
-                    3'b111: zero = !zero;
-                    default: zero = zero;
+                    3'b001: pc_src = !zero;
+                    3'b101: pc_src = !zero;
+                    3'b111: pc_src = !zero;
+                    default: pc_src = zero;
+                endcase
             end
         endcase
     end
