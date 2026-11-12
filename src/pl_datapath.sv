@@ -117,7 +117,7 @@ module pl_datapath (
     assign pc_plus4 = pc_reg + 32'd4;
 
     pl_imem imem (
-        .addr  (pc_reg[9:2]),
+        .addr  (pc_reg[9:2]), //input
         .instr (instr_if)
     );
 
@@ -296,7 +296,19 @@ module pl_datapath (
 
     // Branch resolvido no estagio EX (flush 2 instrucoes se taken)
     assign branch_target = id_ex.pc + id_ex.imm_ext;
-    assign pc_src        = id_ex.branch && zero;
+    //assign pc_src        = id_ex.branch && zero;
+    always_comb begin
+        case(id_ex.branch)
+            1'b0: pc_src = 0;
+            1'b1: begin
+                case(id_ex.funct3)
+                    3'b001: zero = !zero;
+                    3'b101: zero = !zero;
+                    3'b111: zero = !zero;
+                    default: zero = zero;
+            end
+        endcase
+    end
 
     // =========================================================================
     // Registrador EX/MEM

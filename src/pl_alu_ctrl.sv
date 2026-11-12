@@ -26,7 +26,17 @@ module pl_alu_ctrl (
         case (ALUOp)
             2'b00: Operation = 4'd01;   // Load / Store -> ADD
 
-            2'b01: Operation = 4'd02;   // Branch BEQ  -> SUB
+            2'b01: begin //Operation = 4'd02;
+                case (Funct3)
+                    3'b000: Operation = 4'd02; // BEQ(==)
+                    3'b001: Operation = 4'd02; // BNE(!=)
+                    3'b100: Operation = 4'd11; //BLT(< com sinal)
+                    3'b101: Operation = 4'd11; //BGE(>= com sinal) 
+                    3'b110: Operation = 4'd12; //BLTU(< sem sinal)
+                    3'b111: Operation = 4'd12; //BGEU(>= sem sinal)
+                    default: Operation = 4'd01;
+                endcase
+            end
 
             2'b10: begin                // R-type: decodificar Funct
                 case (Funct3)
