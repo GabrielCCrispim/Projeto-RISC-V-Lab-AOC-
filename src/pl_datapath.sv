@@ -297,14 +297,14 @@ module pl_datapath (
     // Branch resolvido no estagio EX (flush 2 instrucoes se taken)
     assign branch_target = id_ex.pc + id_ex.imm_ext;
     //assign pc_src        = id_ex.branch && zero;
-    always_comb begin
+    always_comb begin // Bloco de sinal que serve cpmp uma flag para identificação do desvio 
         case(id_ex.branch)
             1'b0: pc_src = 0;
             1'b1: begin
-                case(id_ex.funct3)
-                    3'b001: pc_src = !zero;
-                    3'b101: pc_src = !zero;
-                    3'b111: pc_src = !zero;
+                case(id_ex.funct3) 
+                    3'b001: pc_src = !zero; // BEQ - Zero está indicando que os números tem mesmo valor, então invertemos
+                    3'b100: pc_src = !zero; // BLT - Zero está ativo quando ele é >=, então invertemos
+                    3'b110: pc_src = !zero; // BLTU - Zero está ativo quando ele é >=, então invertemos
                     default: pc_src = zero;
                 endcase
             end
