@@ -297,7 +297,7 @@ module pl_datapath (
     // Branch resolvido no estagio EX (flush 2 instrucoes se taken)
     assign branch_target = id_ex.pc + id_ex.imm_ext;
     //assign pc_src        = id_ex.branch && zero;
-    always_comb begin // Bloco de sinal que serve cpmp uma flag para identificação do desvio 
+    always_comb begin // Bloco de sinal que serve como uma flag para identificação do desvio 
         case(id_ex.branch)
             1'b0: pc_src = 0;
             1'b1: begin
