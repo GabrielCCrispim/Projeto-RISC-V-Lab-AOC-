@@ -366,6 +366,45 @@ module pl_datapath (
     );
 
     assign mem_read_data = mmio_sel ? mmio_rd : dmem_rd;
+    // =========================================================================
+    // Implementação de L-Types (Loads Parciais)
+    //   LB  - 8 bits  com sinal (repete o bit 7)
+    //   LBU - 8 bits  sem sinal (completa com zeros)
+    //   LH  - 16 bits com sinal (repete o bit 15)
+    //   LHU - 16 bits sem sinal (completa com zeros)
+    //   LW  - 32 bits (palavra inteira, sem extensao) //já estava implementado
+    // =========================================================================
+    logic        mmio_sel;
+    logic [31:0] dmem_rd, mmio_rd, mem_read_data;
+    logic [7:0]  byte_sel;   // byte escolhido pelo offset (LB/LBU)
+    logic [15:0] half_sel;   // meia-palavra escolhida pelo offset (LH/LHU)
+    logic [31:0] load_data;  // valor final do load, ja recortado e estendido
+
+    // Observar o byte solicitado: temos que adaptar a leitura que lê a memoria em multiplos de 4 bytes. 
+    always_comb begin
+        case (ex_mem.alu_result[1:0]) //Byte: Para LB e LBU.
+            2'b00:   byte_sel = mem_read_data[7:0];  //Byte 4X + 0
+            2'b01:   byte_sel = mem_read_data[15:8]; //Byte 4X + 1
+            2'b10:   byte_sel = mem_read_data[23:16];//Byte 4X + 2
+            2'b11:   byte_sel = mem_read_data[31:24];//Byte 4X + 3
+            default: byte_sel = mem_read_data[7:0];
+        endcase
+    end
+
+    // Meia-palavra: Para LH e LHU
+    // alu_result[1] escolhe a metade baixa ou alta
+    assign half_sel = ex_mem.alu_result[1] ? mem_read_data[31:16]: mem_read_data[15:0];
+
+    // Aplicando as extensões necessárias (com ou sem sinal) para adaptar o resultado da leitura para 32 bits
+    always_comb begin
+        case (ex_mem.funct3)
+            3'b000:  load_data = {{24{byte_sel[7]}},  byte_sel};  // LB
+            3'b001:  load_data = {{16{half_sel[15]}}, half_sel};  // LH
+            3'b100:  load_data = {24'b0, byte_sel};               // LBU
+            3'b101:  load_data = {16'b0, half_sel};               // LHU
+            default: load_data = mem_read_data;                   // LW
+        endcase
+    end
 
     // Saidas de observabilidade para o testbench
     assign mem_wr_en   = ex_mem.mem_write & ~mmio_sel;
@@ -386,11 +425,10 @@ module pl_datapath (
             mem_wb.mem_to_reg <= ex_mem.mem_to_reg;
             mem_wb.reg_write  <= ex_mem.reg_write;
             mem_wb.alu_result <= ex_mem.alu_result;
-            mem_wb.read_data  <= mem_read_data;
+            mem_wb.read_data  <= load_data;         //Adaptação para L-Types 
             mem_wb.rd         <= ex_mem.rd;
         end
     end
 
     // WB: wb_data = mem_to_reg ? read_data : alu_result  (definido acima, no bloco ID)
-
 endmodule
