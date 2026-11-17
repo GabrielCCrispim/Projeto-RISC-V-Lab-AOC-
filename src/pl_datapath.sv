@@ -374,8 +374,7 @@ module pl_datapath (
     //   LHU - 16 bits sem sinal (completa com zeros)
     //   LW  - 32 bits (palavra inteira, sem extensao) //já estava implementado
     // =========================================================================
-    logic        mmio_sel;
-    logic [31:0] dmem_rd, mmio_rd, mem_read_data;
+
     logic [7:0]  byte_sel;   // byte escolhido pelo offset (LB/LBU)
     logic [15:0] half_sel;   // meia-palavra escolhida pelo offset (LH/LHU)
     logic [31:0] load_data;  // valor final do load, ja recortado e estendido
