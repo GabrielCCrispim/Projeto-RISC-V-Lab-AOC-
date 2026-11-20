@@ -38,7 +38,7 @@ module pl_control (
     output logic [1:0] ASrc, // Novo sinal de controle para add 0 em LUI ou add PC em AIUPC
     output logic [1:0] ALUOp,
     output logic Jump, // novos sinais para JAL e JALR
-    output logic JALR
+    output logic Jalr
 );
 
     localparam R_TYPE = 7'b0110011;
@@ -60,7 +60,7 @@ module pl_control (
         Branch   = 1'b0;
         ALUOp    = 2'b00;
         ASrc     = 2'b00; // 2'b00 = rs1(como padrão) | 2'b01 = 0(para adicionar 0 ao LUI) | 2'b10 = PC(para adicionar ao AUIPC)
-        Jump     = 1'b0; // Padrão para os dois
+        JustJump = 1'b0;  // Pulo tipo JAL/JALR
         Jalr     = 1'b0;
 
         case (Opcode)
