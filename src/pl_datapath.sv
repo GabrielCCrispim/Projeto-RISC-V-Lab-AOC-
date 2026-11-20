@@ -301,8 +301,8 @@ module pl_datapath (
     );
 
     // Branch resolvido no estagio EX (flush 2 instrucoes se taken)
-    assign branch_target = id_ex.pc + id_ex.imm_ext;
-    //assign pc_src        = id_ex.branch && zero;
+    assign branch_target = id_ex.jalr ? (alu_result & ~32'd1)          // JALR: (rs1 + imm) & ~1
+                                      : (id_ex.pc + id_ex.imm_ext);    // branch e JAL: PC + imm
     always_comb begin // Bloco de sinal que serve como uma flag para identificação do desvio 
         case(id_ex.branch)
             1'b0: pc_src = 0;
@@ -335,7 +335,7 @@ module pl_datapath (
             ex_mem.reg_write   <= id_ex.reg_write;
             ex_mem.mem_read    <= id_ex.mem_read;
             ex_mem.mem_write   <= id_ex.mem_write;
-            ex_mem.alu_result  <= alu_result;
+            ex_mem.alu_result  <= id_ex.justjump ? (id_ex.pc + 32'd4) : alu_result;  // JAL/JALR: rd = PC+4
             ex_mem.write_data  <= fwd_srcb;   // rs2 adiantado (para SW/MMIO)
             ex_mem.rd          <= id_ex.rd;
             ex_mem.funct3      <= id_ex.funct3;
