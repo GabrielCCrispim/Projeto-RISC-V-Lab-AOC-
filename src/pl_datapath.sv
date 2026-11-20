@@ -340,12 +340,41 @@ module pl_datapath (
     // MEM -- Memoria de dados + MMIO
     // =========================================================================
     assign mmio_sel = ex_mem.alu_result[10];
+    
+    // =========================================================================
+    // Implementação de S-Types (Stores Parciais)
+    //   SB - grava 1 byte  (rs2[7:0])  no byte escolhido por alu_result[1:0]
+    //   SH - grava 2 bytes (rs2[15:0]) na metade escolhida por alu_result[1]
+    //   SW - grava a palavra inteira
+    // =========================================================================
+
+    logic [31:0] store_data;  // palavra final gravada na dmem (SB/SH/SW)
+
+    always_comb begin
+        store_data = dmem_rd;                              // parte da palavra que já está na memória
+        case (ex_mem.funct3)
+            3'b000: begin                                  // SB
+                case (ex_mem.alu_result[1:0])
+                    2'b00: store_data[7:0]   = ex_mem.write_data[7:0];
+                    2'b01: store_data[15:8]  = ex_mem.write_data[7:0];
+                    2'b10: store_data[23:16] = ex_mem.write_data[7:0];
+                    2'b11: store_data[31:24] = ex_mem.write_data[7:0];
+                    default: ;
+                endcase
+            end
+            3'b001: begin                                  // SH
+                if (ex_mem.alu_result[1]) store_data[31:16] = ex_mem.write_data[15:0];
+                else                      store_data[15:0]  = ex_mem.write_data[15:0];
+            end
+            default: store_data = ex_mem.write_data;       // SW
+        endcase
+    end
 
     pl_dmem dmem (
         .clk       (clk),
         .MemWrite  (ex_mem.mem_write & ~mmio_sel),
         .addr      (ex_mem.alu_result[9:2]),
-        .WriteData (ex_mem.write_data),
+        .WriteData (store_data),
         .ReadData  (dmem_rd)
     );
 
@@ -408,7 +437,7 @@ module pl_datapath (
     // Saidas de observabilidade para o testbench
     assign mem_wr_en   = ex_mem.mem_write & ~mmio_sel;
     assign mem_wr_addr = ex_mem.alu_result[9:2];
-    assign mem_wr_data = ex_mem.write_data;
+    assign mem_wr_data = store_data;
 
     // =========================================================================
     // Registrador MEM/WB
