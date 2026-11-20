@@ -48,11 +48,13 @@ module pl_cpu (
     logic       ALUSrc, MemtoReg, RegWrite, MemRead, MemWrite, Branch;
     logic [1:0] ALUOp;
     logic [1:0] ASrc; // Sinal do tipo U
+    logic       JustJump, Jalr;   // JAL/JALR
 
     logic [2:0] funct3_ex;
     logic [6:0] funct7_ex;
     logic [1:0] aluop_ex;
     logic [3:0] alu_cc;
+
 
     // -------------------------------------------------------------------------
     // Unidade de controle principal (estagio ID)
@@ -66,7 +68,9 @@ module pl_cpu (
         .MemRead  (MemRead),
         .MemWrite (MemWrite),
         .Branch   (Branch),
-        .ALUOp    (ALUOp)
+        .ALUOp    (ALUOp),
+        .JustJump (JustJump),
+        .Jalr     (Jalr)
     );
 
     // -------------------------------------------------------------------------
@@ -93,6 +97,8 @@ module pl_cpu (
         .Branch       (Branch),
         .ALUOp        (ALUOp),
         .ASrc         (ASrc),
+        .JustJump     (JustJump),
+        .Jalr         (Jalr),
         .ALU_CC       (alu_cc),
         .Opcode       (opcode),
         .Funct3_EX    (funct3_ex),
@@ -111,6 +117,7 @@ module pl_cpu (
         .mem_wr_en    (mem_wr_en),
         .mem_wr_addr  (mem_wr_addr),
         .mem_wr_data  (mem_wr_data)
+        
     );
 
 endmodule
