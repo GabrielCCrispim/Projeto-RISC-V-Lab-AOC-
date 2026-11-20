@@ -1,0 +1,58 @@
+PC;Instrucao;Destino;Valor esperado;O que testa
+0x000;addi x1,x0,7;x1;0x00000007;ADDI (valor base A = 7)
+0x004;addi x2,x0,-20;x2;0xFFFFFFEC;ADDI com imediato negativo (valor base B = -20)
+0x008;addi x3,x0,3;x3;0x00000003;ADDI (quantidade de shift)
+0x00C;lui x4,74565;x4;0x12345000;LUI
+0x010;addi x4,x4,1656;x4;0x12345678;ADDI logo apos LUI (forwarding EX/MEM)
+0x014;add x5,x1,x2;x5 e dmem[0] (0x000);0xFFFFFFF3;ADD (7 + -20 = -13)
+0x018;sub x6,x1,x2;x6 e dmem[1] (0x004);0x0000001B;SUB (7 - -20 = 27)
+0x01C;xor x7,x1,x2;x7 e dmem[2] (0x008);0xFFFFFFEB;XOR
+0x020;or x8,x1,x2;x8 e dmem[3] (0x00C);0xFFFFFFEF;OR
+0x024;and x9,x1,x2;x9 e dmem[4] (0x010);0x00000004;AND
+0x028;sll x10,x1,x3;x10 e dmem[5] (0x014);0x00000038;SLL (7 << 3 = 56)
+0x02C;srl x11,x2,x3;x11 e dmem[6] (0x018);0x1FFFFFFD;SRL entra zero pela esquerda
+0x030;sra x12,x2,x3;x12 e dmem[7] (0x01C);0xFFFFFFFD;SRA repete o sinal (-20 >> 3 = -3)
+0x034;slt x13,x2,x1;x13 e dmem[8] (0x020);0x00000001;SLT com sinal (-20 < 7); sem sinal daria 0
+0x038;sltu x14,x1,x2;x14 e dmem[9] (0x024);0x00000001;SLTU sem sinal (7 < 0xFFFFFFEC); com sinal daria 0
+0x03C;addi x15,x2,100;x15 e dmem[10] (0x028);0x00000050;ADDI (-20 + 100 = 80); x15 vira a base dos loads/stores
+0x040;xori x16,x1,-1;x16 e dmem[11] (0x02C);0xFFFFFFF8;XORI com imediato negativo (= NOT x1)
+0x044;ori x17,x1,112;x17 e dmem[12] (0x030);0x00000077;ORI
+0x048;andi x18,x2,240;x18 e dmem[13] (0x034);0x000000E0;ANDI
+0x04C;slti x19,x2,-19;x19 e dmem[14] (0x038);0x00000001;SLTI com sinal e imediato negativo (-20 < -19)
+0x050;slli x20,x1,8;x20 e dmem[15] (0x03C);0x00000700;SLLI
+0x054;srli x21,x2,4;x21 e dmem[16] (0x040);0x0FFFFFFE;SRLI entra zero pela esquerda
+0x058;srai x22,x2,2;x22 e dmem[17] (0x044);0xFFFFFFFB;SRAI repete o sinal (-20 >> 2 = -5)
+0x05C;lui x23,74565;x23 e dmem[18] (0x048);0x12345000;LUI (parte baixa zerada)
+0x060;auipc x24,1;x24 e dmem[19] (0x04C);0x00001060;AUIPC (PC 0x060 + 0x1000)
+0x064 a 0x0B0;sw x5..x24,0..76(x0);dmem[0] a dmem[19];valores acima;SW grava os resultados de ALU e U-type
+0x0B4;lui x25,8;x25;0x00008000;LUI
+0x0B8;addi x25,x25,52;x25;0x00008034;valor usado pelo SH
+0x0BC;sw x4,0(x15);dmem[20] (0x050);0x12345678;SW com base x15 (80)
+0x0C0;sw x4,4(x15);dmem[21] (0x054);0x12345678;prepara a palavra para o SB
+0x0C4;sb x2,5(x15);dmem[21] (0x054);0x1234EC78;SB no byte 1 grava so 0xEC e preserva os outros 3 bytes
+0x0C8;sw x4,8(x15);dmem[22] (0x058);0x12345678;prepara a palavra para o SH
+0x0CC;sh x25,10(x15);dmem[22] (0x058);0x80345678;SH na metade alta grava so 0x8034 e preserva a baixa
+0x0D0;lw x25,0(x15);x25 e dmem[23] (0x05C);0x12345678;LW
+0x0D4;lb x26,5(x15);x26 e dmem[24] (0x060);0xFFFFFFEC;LB estende o sinal do byte 0xEC
+0x0D8;lbu x27,5(x15);x27 e dmem[25] (0x064);0x000000EC;LBU completa com zeros
+0x0DC;lh x28,10(x15);x28 e dmem[26] (0x068);0xFFFF8034;LH estende o sinal de 0x8034
+0x0E0;lhu x29,10(x15);x29 e dmem[27] (0x06C);0x00008034;LHU completa com zeros
+0x0E4;sw x29,108(x0);dmem[27] (0x06C);0x00008034;load seguido de store do mesmo registrador (1 bolha + forwarding)
+0x0E8 a 0x0F4;sw x25..x28;dmem[23] a dmem[26];valores acima;SW dos resultados dos loads
+0x0F8;addi x30,x0,0;x30;0x00000000;zera a assinatura dos desvios que DEVEM ser tomados
+0x0FC;addi x31,x0,0;x31;0x00000000;zera a assinatura dos desvios que NAO devem ser tomados
+0x100;beq x1,x1,8;x30 bit 0;+1;BEQ tomado (7 = 7)
+0x10C;beq x1,x2,8;x31 bit 0;+1;BEQ nao tomado (7 != -20)
+0x114;bne x1,x2,8;x30 bit 1;+2;BNE tomado
+0x120;bne x1,x1,8;x31 bit 1;+2;BNE nao tomado
+0x128;blt x2,x1,8;x30 bit 2;+4;BLT tomado (-20 < 7 com sinal)
+0x134;blt x1,x2,8;x31 bit 2;+4;BLT nao tomado (7 < -20 e falso)
+0x13C;bge x1,x2,8;x30 bit 3;+8;BGE tomado (7 >= -20 com sinal)
+0x148;bge x2,x1,8;x31 bit 3;+8;BGE nao tomado
+0x150;bltu x1,x2,8;x30 bit 4;+16;BLTU tomado (7 < 0xFFFFFFEC sem sinal)
+0x15C;bltu x2,x1,8;x31 bit 4;+16;BLTU nao tomado
+0x164;bgeu x2,x1,8;x30 bit 5;+32;BGEU tomado (0xFFFFFFEC >= 7 sem sinal)
+0x170;bgeu x1,x2,8;x31 bit 5;+32;BGEU nao tomado
+0x178;sw x30,112(x0);dmem[28] (0x070);0x0000003F;assinatura dos desvios tomados (bit faltando = desvio que falhou)
+0x17C;sw x31,116(x0);dmem[29] (0x074);0x0000003F;assinatura dos desvios nao tomados (bit faltando = desvio que falhou)
+0x180;beq x0,x0,0;-;-;halt (apagar esta linha para rodar na FPGA com --dump)
