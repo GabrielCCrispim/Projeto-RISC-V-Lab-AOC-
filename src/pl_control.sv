@@ -37,7 +37,11 @@ module pl_control (
     output logic       Branch,
     output logic [1:0] ASrc, // Novo sinal de controle para add 0 em LUI ou add PC em AIUPC
     output logic [1:0] ALUOp,
+<<<<<<< HEAD
+    output logic Jump, // novos sinais para JAL e JALR
+=======
     output logic JustJump, // novos sinais para JAL e JALR
+>>>>>>> fe068f0e6f87508dc707e01288ee8da95b29f921
     output logic Jalr
 );
 
