@@ -200,6 +200,8 @@ module pl_datapath (
             id_ex.imm_ext    <= 32'b0;
             id_ex.funct3     <= 3'b0;
             id_ex.funct7     <= 7'b0;
+            id_ex.justjump   <= 1'b0;
+            id_ex.jalr       <= 1'b0;
         end else if (stall || pc_src) begin    // NOP sincrono: load-use ou branch
             id_ex.alu_src    <= 1'b0;
             id_ex.mem_to_reg <= 1'b0;
@@ -305,7 +307,7 @@ module pl_datapath (
                                       : (id_ex.pc + id_ex.imm_ext);    // branch e JAL: PC + imm
     always_comb begin // Bloco de sinal que serve como uma flag para identificação do desvio 
         case(id_ex.branch)
-            1'b0: pc_src = 0;
+            1'b0: pc_src = id_ex.justjump;
             1'b1: begin
                 case(id_ex.funct3) 
                     3'b001: pc_src = !zero; // BEQ - Zero está indicando que os números tem mesmo valor, então invertemos

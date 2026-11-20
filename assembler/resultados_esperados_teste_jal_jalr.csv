@@ -1,0 +1,33 @@
+PC;Instrucao;Destino;Valor esperado;O que testa
+0x000;addi x30,x0,0;x30;0x00000000;zera a assinatura (cada teste que passa soma um bit)
+0x004;addi x31,x0,0;x31;0x00000000;zera o contador de erros (so caminhos errados somam aqui)
+0x008;jal x1,12;x1 e dmem[1] (0x004);0x0000000C;JAL para frente: salta para 0x014 e grava PC+4 = 0x00C
+0x00C e 0x010;addi x31,x31,1;x31;nao executa;caminho errado (JAL nao saltou)
+0x014;addi x30,x30,1;x30 bit 0;+1;chegou ao alvo do JAL
+0x018;jal x5,12;x5 e dmem[2] (0x008);0x0000001C;chamada de funcao: salta para 0x024 e grava o retorno 0x01C
+0x024;addi x30,x30,2;x30 bit 1;+2;entrou na funcao
+0x028;jalr x0,x5,0;-;-;retorno da funcao: salta para x5 = 0x01C (rd = x0 nao grava nada)
+0x01C;addi x30,x30,4;x30 bit 2;+4;voltou da funcao no lugar certo
+0x020;jal x0,12;-;-;JAL com rd = x0 pula a funcao e vai para 0x02C
+0x02C;auipc x6,0;x6;0x0000002C;base para calcular o alvo
+0x030;addi x6,x6,15;x6;0x0000003B;alvo impar (forwarding EX/MEM no rs1)
+0x034;jalr x7,x6,2;x7 e dmem[3] (0x00C);0x00000038;JALR com rs1 por forwarding EX/MEM e imediato: (0x3B + 2) and ~1 = 0x03C; grava PC+4 = 0x038
+0x038;addi x31,x31,1;x31;nao executa;caminho errado (JALR nao saltou)
+0x03C;auipc x10,0;x10 e dmem[4] (0x010);0x0000003C;confere o PC do alvo: daria 0x03D se o bit 0 nao fosse zerado
+0x040;addi x30,x30,8;x30 bit 3;+8;chegou ao alvo do JALR
+0x044;auipc x8,0;x8;0x00000044;base para o alvo
+0x048;addi x8,x8,24;x8;0x0000005C;endereco do alvo
+0x04C;sw x8,0(x0);dmem[0] (0x000);0x0000005C;guarda o alvo na memoria
+0x050;lw x9,0(x0);x9;0x0000005C;le o alvo de volta
+0x054;jalr x0,x9,0;-;-;JALR logo apos load do rs1 (1 bolha + forwarding MEM/WB); salta para 0x05C
+0x058;addi x31,x31,1;x31;nao executa;caminho errado
+0x05C;addi x30,x30,16;x30 bit 4;+16;chegou ao alvo do JALR com rs1 vindo de load
+0x060;jal x0,12;-;-;salta para 0x06C
+0x06C;jal x0,-8;-;-;JAL para tras (offset negativo): volta para 0x064
+0x070;addi x31,x31,1;x31;nao executa;caminho errado (JAL para tras nao saltou)
+0x064;addi x30,x30,32;x30 bit 5;+32;so chega aqui pelo salto para tras
+0x068;jal x0,12;-;-;segue para 0x074
+0x074 a 0x080;sw x1,x5,x7,x10;dmem[1] a dmem[4];valores acima;grava os enderecos de retorno e o PC do alvo
+0x084;sw x30,20(x0);dmem[5] (0x014);0x0000003F;assinatura: os 6 testes passaram (bit faltando = teste que falhou)
+0x088;sw x31,24(x0);dmem[6] (0x018);0x00000000;erros: deve ficar zero
+0x08C;beq x0,x0,0;-;-;halt (a versao _fpga nao tem esta linha)
