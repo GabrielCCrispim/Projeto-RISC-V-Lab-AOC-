@@ -36,7 +36,9 @@ module pl_control (
     output logic       MemWrite,
     output logic       Branch,
     output logic [1:0] ASrc, // Novo sinal de controle para add 0 em LUI ou add PC em AIUPC
-    output logic [1:0] ALUOp
+    output logic [1:0] ALUOp,
+    output logic Jump, // novos sinais para JAL e JALR
+    output logic JALR
 );
 
     localparam R_TYPE = 7'b0110011;
@@ -46,6 +48,8 @@ module pl_control (
     localparam I_TYPE = 7'b0010011;
     localparam U_TYPE_AUIPC = 7'b0010111;
     localparam U_TYPE_LUI = 7'b0110111;
+    localparam J_TYPE_JAL = 7'b1101111;
+    localparam I_TYPE_JALR = 7'b1100111;
 
     always_comb begin
         ALUSrc   = 1'b0;
@@ -56,6 +60,8 @@ module pl_control (
         Branch   = 1'b0;
         ALUOp    = 2'b00;
         ASrc     = 2'b00; // 2'b00 = rs1(como padrão) | 2'b01 = 0(para adicionar 0 ao LUI) | 2'b10 = PC(para adicionar ao AUIPC)
+        Jump     = 1'b0; // Padrão para os dois
+        Jalr     = 1'b0;
 
         case (Opcode)
             I_TYPE: begin
@@ -99,6 +105,17 @@ module pl_control (
                 RegWrite = 1'b1;
                 ASrc     = 2'b01; // + 0
                 ALUOp    = 2'b00; // setando como zero, pois vai usar ADD
+            end
+            J_TYPE_JAL: begin
+                RegWrite = 1'b1; // rd = PC + 4
+                Jump     = 1'b1;
+            end
+            I_TYPE_JALR: begin
+                ALUSrc   = 1'b1;  //rs1 + imm
+                ALUOp    = 2'b00; // ADD
+                ASrc     = 2'b00; // rs1
+                RegWrite = 1'b1;
+                Jalr     = 1'b1;
             end
             default: ; // sinais permanecem em zero (seguro)
         endcase
