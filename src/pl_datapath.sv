@@ -218,7 +218,7 @@ module pl_datapath (
             id_ex.imm_ext    <= 32'b0;
             id_ex.funct3     <= 3'b0;
             id_ex.funct7     <= 7'b0;
-            id_ex.jump       <= 1'b0;
+            id_ex.justjump       <= 1'b0;
             id_ex.jalr       <= 1'b0;
         end else begin
             id_ex.alu_src    <= ALUSrc;
@@ -238,7 +238,7 @@ module pl_datapath (
             id_ex.imm_ext    <= imm_ext;
             id_ex.funct3     <= if_id.instr[14:12];
             id_ex.funct7     <= if_id.instr[31:25];
-            id_ex.jump       <= JustJump;
+            id_ex.justjump       <= JustJump;
             id_ex.jalr       <= Jalr;
         end
     end

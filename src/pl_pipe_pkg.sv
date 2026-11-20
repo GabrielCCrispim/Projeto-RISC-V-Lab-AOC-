@@ -28,7 +28,7 @@ package pl_pipe_pkg;
         logic        mem_write;
         logic [1:0]  alu_op;
         logic        branch;
-        logic        just_jump; // JAL/JALR: salto incondicional + grava PC+4
+        logic        justjump; // JAL/JALR: salto incondicional + grava PC+4
         logic        jalr;      // JALR: alvo = (rs1 + imm) & ~1
         // dados
         logic [31:0] pc;
