@@ -315,7 +315,7 @@ ASrc[0] <= Decoder0.DB_MAX_OUTPUT_PORT_TYPE
 ASrc[1] <= Decoder0.DB_MAX_OUTPUT_PORT_TYPE
 ALUOp[0] <= ALUOp.DB_MAX_OUTPUT_PORT_TYPE
 ALUOp[1] <= ALUOp.DB_MAX_OUTPUT_PORT_TYPE
-Jump <= Decoder0.DB_MAX_OUTPUT_PORT_TYPE
+JustJump <= JustJump.DB_MAX_OUTPUT_PORT_TYPE
 Jalr <= Decoder0.DB_MAX_OUTPUT_PORT_TYPE
 
 
@@ -389,6 +389,8 @@ MemWrite => id_ex.DATAA
 Branch => id_ex.DATAA
 ASrc[0] => id_ex.DATAA
 ASrc[1] => id_ex.DATAA
+JustJump => ~NO_FANOUT~
+Jalr => ~NO_FANOUT~
 ALUOp[0] => id_ex.DATAA
 ALUOp[1] => id_ex.DATAA
 ALU_CC[0] => ALU_CC[0].IN1

@@ -111,10 +111,10 @@ set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 set_global_assignment -name VERILOG_SHOW_LMF_MAPPING_MESSAGES OFF
-set_global_assignment -name SDC_FILE quartus/pl_top.sdc
-set_global_assignment -name TEXT_FILE add_to_qsf.txt
 set_global_assignment -name MIF_FILE instruction.mif
 set_global_assignment -name MIF_FILE data.mif
+set_global_assignment -name SDC_FILE quartus/pl_top.sdc
+set_global_assignment -name TEXT_FILE add_to_qsf.txt
 set_global_assignment -name VERILOG_FILE src/pll_10mhz.v
 set_global_assignment -name SYSTEMVERILOG_FILE src/pl_uart.sv
 set_global_assignment -name SYSTEMVERILOG_FILE src/pl_top.sv
