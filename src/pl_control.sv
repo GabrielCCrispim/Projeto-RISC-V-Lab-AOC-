@@ -38,7 +38,7 @@ module pl_control (
     output logic [1:0] ASrc, // Novo sinal de controle para add 0 em LUI ou add PC em AIUPC
     output logic [1:0] ALUOp,
     output logic Jump, // novos sinais para JAL e JALR
-    output logic JALR
+    output logic Jalr
 );
 
     localparam R_TYPE = 7'b0110011;
