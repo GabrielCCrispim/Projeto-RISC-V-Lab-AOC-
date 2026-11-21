@@ -310,7 +310,7 @@ module pl_datapath (
             1'b0: pc_src = id_ex.justjump;
             1'b1: begin
                 case(id_ex.funct3) 
-                    3'b001: pc_src = !zero; // BEQ - Zero está indicando que os números tem mesmo valor, então invertemos
+                    3'b001: pc_src = !zero; // BNE - Zero está indicando que os números tem mesmo valor, então invertemos
                     3'b100: pc_src = !zero; // BLT - Zero está ativo quando ele é >=, então invertemos
                     3'b110: pc_src = !zero; // BLTU - Zero está ativo quando ele é >=, então invertemos
                     default: pc_src = zero;
